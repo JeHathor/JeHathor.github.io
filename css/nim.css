@@ -1,0 +1,167 @@
+/* ── Nim game styles — depends on shared.css for :root variables ── */
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 2rem 0;
+}
+
+/* ── Container ── */
+.container {
+    position: relative; z-index: 10;
+    max-width: 680px; width: 100%;
+    animation: fadeUp 0.8s ease both;
+}
+
+/* ── Header ── */
+.site-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* ── Score cards ── */
+.scores {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.score-card {
+    border: 1px solid var(--border); background: var(--panel);
+    padding: 1.2rem; text-align: center;
+}
+.score-label {
+    font-family: 'Cinzel', serif; font-size: 0.6rem;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 0.4rem;
+}
+.score-value {
+    font-family: 'Cinzel Decorative', serif; font-size: 2.4rem;
+    line-height: 1;
+}
+.player-score { color: #4a9eff; text-shadow: 0 0 20px rgba(74,158,255,0.4); }
+.bot-score    { color: #e05555; text-shadow: 0 0 20px rgba(224,85,85,0.4);  }
+
+/* ── Stick arena ── */
+.sticks-container {
+    border: 1px solid var(--border); background: rgba(0,0,0,0.4);
+    padding: 2rem 1.5rem; margin-bottom: 1.2rem;
+    min-height: 140px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; align-items: center;
+}
+.stick {
+    width: 7px; height: 72px;
+    background: linear-gradient(to bottom, var(--gold-light), var(--gold), #7a5c1e);
+    border-radius: 3px;
+    box-shadow: 0 0 6px rgba(201,168,76,0.35);
+    transition: opacity 0.3s;
+}
+
+/* ── Remaining count ── */
+.remaining {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem; letter-spacing: 0.15em;
+    color: var(--gold-light); text-align: center;
+    margin-bottom: 1.5rem; opacity: 0.85;
+}
+
+/* ── Controls ── */
+.control-label {
+    font-family: 'Cinzel', serif; font-size: 0.62rem;
+    letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-dim); display: block; margin-bottom: 0.7rem;
+}
+.button-group {
+    display: flex; gap: 0.6rem; margin-bottom: 1rem;
+}
+.select-btn {
+    flex: 1; padding: 0.85rem;
+    font-family: 'Cinzel', serif; font-size: 1.1rem;
+    color: var(--text-dim);
+    border: 1px solid var(--border); background: var(--panel);
+    cursor: pointer;
+    transition: border-color 0.25s, color 0.25s, background 0.25s;
+}
+.select-btn:hover { border-color: var(--gold); color: var(--gold); }
+.select-btn.selected {
+    border: 1px solid var(--gold); background: rgba(201,168,76,0.12);
+    color: var(--gold-light);
+}
+
+/* ── Action buttons ── */
+.take-btn, .new-game-btn {
+    width: 100%;
+    font-family: 'Cinzel', serif; font-size: 0.78rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 1rem; border: none; cursor: pointer;
+    transition: background 0.25s;
+    margin-bottom: 0.8rem;
+}
+.take-btn {
+    background: var(--gold); color: var(--dark); font-weight: 600;
+}
+.take-btn:hover:not(:disabled) { background: var(--gold-light); }
+.take-btn:disabled {
+    background: rgba(201,168,76,0.2); color: var(--text-dim); cursor: not-allowed;
+}
+.new-game-btn {
+    background: transparent; color: var(--gold);
+    border: 1px solid var(--gold);
+}
+.new-game-btn:hover { background: rgba(201,168,76,0.1); }
+
+/* ── Settings ── */
+.settings {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+.setting-label {
+    font-family: 'Cinzel', serif; font-size: 0.58rem;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-dim); display: block; margin-bottom: 0.5rem;
+}
+select, input[type="text"] {
+    width: 100%; padding: 0.65rem 0.8rem;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--border); font-family: 'Raleway', sans-serif;
+    font-size: 0.82rem; outline: none;
+    transition: border-color 0.25s;
+    appearance: none; -webkit-appearance: none;
+}
+select:focus, input[type="text"]:focus { border-color: var(--gold); }
+select option { background: #111118; }
+
+/* ── Log ── */
+.log-container {
+    border: 1px solid var(--border); background: var(--panel);
+    padding: 1rem;
+}
+.log-title {
+    font-family: 'Cinzel', serif; font-size: 0.58rem;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 0.6rem;
+}
+.log-scroll { max-height: 120px; overflow-y: auto; }
+.log-entry {
+    font-size: 0.75rem; color: var(--text-dim);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    line-height: 1.5;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-entry.player { color: rgba(74,158,255,0.85); }
+.log-entry.bot    { color: rgba(224,85,85,0.85); }
+.log-entry.win    { color: var(--gold-light); font-family: 'Cinzel', serif; letter-spacing: 0.1em; }
+
+/* ── Stick pop animation ── */
+.stick-pop { animation: stickPop 0.3s ease both; }
+@keyframes stickPop {
+    from { opacity: 0; transform: scaleY(0.4); }
+    to   { opacity: 1; transform: scaleY(1); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .settings { grid-template-columns: 1fr; }
+}
