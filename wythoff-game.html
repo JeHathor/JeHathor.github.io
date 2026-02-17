@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wythoff's Game — JeHathor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/shared.css" />
+    <link rel="stylesheet" href="css/wythoff.css" />
+</head>
+<body>
+    <div class="container">
+
+        <div class="site-header">
+            <div class="logo-rule"><div class="diamond"></div><h1>Wythoff's Game</h1><div class="diamond"></div></div>
+            <p class="subtitle">Two piles &mdash; take the last stick to win</p>
+        </div>
+
+        <div class="scores">
+            <div class="score-card">
+                <div class="score-label" id="playerLabel">Human Player</div>
+                <div class="score-value player-score" id="playerScore">0</div>
+            </div>
+            <div class="score-card">
+                <div class="score-label">WythBot</div>
+                <div class="score-value bot-score" id="botScore">0</div>
+            </div>
+        </div>
+
+        <!-- Two pile arenas -->
+        <div class="piles-wrapper">
+            <div class="pile-panel" id="pileAPanel">
+                <div class="pile-title">Pile A</div>
+                <div class="sticks-container" id="pileASticks"></div>
+                <div class="pile-count" id="pileACount">7</div>
+            </div>
+            <div class="pile-panel" id="pileBPanel">
+                <div class="pile-title">Pile B</div>
+                <div class="sticks-container" id="pileBSticks"></div>
+                <div class="pile-count" id="pileBCount">10</div>
+            </div>
+        </div>
+
+        <!-- Move type -->
+        <span class="control-label">Move type:</span>
+        <div class="move-type-row" id="moveTypeRow">
+            <button class="move-type-btn selected" data-type="A" onclick="selectMoveType('A')">
+                From Pile A<br>only
+            </button>
+            <button class="move-type-btn" data-type="B" onclick="selectMoveType('B')">
+                From Pile B<br>only
+            </button>
+            <button class="move-type-btn" data-type="AB" onclick="selectMoveType('AB')">
+                Equal from<br>both piles
+            </button>
+        </div>
+
+        <!-- Amount -->
+        <span class="control-label">Amount: <span id="amountHint"></span></span>
+        <div class="button-group" id="buttonGroup"></div>
+
+        <button class="take-btn" id="takeBtn">Take 1 from Pile A</button>
+        <button class="new-game-btn hidden" id="newGameBtn">◆ &nbsp; New Game &nbsp; ◆</button>
+
+        <div class="divider"><span>◆</span></div>
+
+        <div class="settings">
+            <div>
+                <label class="setting-label" for="difficulty">Difficulty</label>
+                <select id="difficulty">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard" selected>Hard</option>
+                    <option value="Expert">Expert</option>
+                </select>
+            </div>
+            <div>
+                <label class="setting-label" for="playerName">Player Name</label>
+                <input type="text" id="playerName" value="Human Player">
+            </div>
+        </div>
+
+        <div class="log-container">
+            <div class="log-title">Game Log</div>
+            <div class="log-scroll" id="gameLog">
+                <div class="log-entry">No moves yet...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>&copy; JeHathor &nbsp;·&nbsp; Hosted on GitHub Pages</footer>
+
+    <script>
+        // ── Wythoff's Game ──
+        // On each turn a player may either:
+        //   (a) remove any number of sticks from Pile A,
+        //   (b) remove any number of sticks from Pile B, or
+        //   (c) remove an equal number from BOTH piles.
+        // The player who takes the very last stick wins.
+        //
+        // Perfect strategy: P-positions (previous player loses, i.e. YOU lose if you
+        // leave this for yourself) are exactly:
+        //   (⌊nφ⌋, ⌊nφ²⌋)  for n = 0,1,2,3,...   where φ = (1+√5)/2
+        // The bot computes whether the current position is a P-position and if not,
+        // finds a move that lands the opponent in one.
+
+        const PHI = (1 + Math.sqrt(5)) / 2;
+
+        const game = {
+            pileA: 7,
+            pileB: 10,
+            playerScore: 0,
+            botScore: 0,
+            difficulty: 'Expert',
+            playerName: 'Human Player',
+            moveType: 'A',   // 'A', 'B', or 'AB'
+            selectedAmount: 1,
+            isGameOver: false,
+            logs: []
+        };
+
+        // ── Wythoff math ──
+
+        function isPPosition(a, b) {
+            // Ensure a <= b
+            if (a > b) [a, b] = [b, a];
+            const n = b - a;
+            const pa = Math.floor(n * PHI);
+            return pa === a;
+        }
+
+        function findWinningMove(a, b) {
+            // Try all valid moves and return one that leaves opponent in P-position
+            // 1. Remove k from A
+            for (let k = 1; k <= a; k++) {
+                if (isPPosition(a - k, b)) return { type: 'A', amount: k };
+            }
+            // 2. Remove k from B
+            for (let k = 1; k <= b; k++) {
+                if (isPPosition(a, b - k)) return { type: 'B', amount: k };
+            }
+            // 3. Remove k from both
+            const maxBoth = Math.min(a, b);
+            for (let k = 1; k <= maxBoth; k++) {
+                if (isPPosition(a - k, b - k)) return { type: 'AB', amount: k };
+            }
+            return null; // Already in P-position — any move loses
+        }
+
+        function randomValidMove(a, b) {
+            const moves = [];
+            for (let k = 1; k <= a; k++) moves.push({ type: 'A', amount: k });
+            for (let k = 1; k <= b; k++) moves.push({ type: 'B', amount: k });
+            const maxBoth = Math.min(a, b);
+            for (let k = 1; k <= maxBoth; k++) moves.push({ type: 'AB', amount: k });
+            return moves[Math.floor(Math.random() * moves.length)];
+        }
+
+        function botMove(a, b) {
+            const winning = findWinningMove(a, b);
+
+            if (game.difficulty === 'Easy') {
+                return randomValidMove(a, b);
+            }
+            if (game.difficulty === 'Medium') {
+                return Math.random() < 0.5 && winning ? winning : randomValidMove(a, b);
+            }
+            if (game.difficulty === 'Hard') {
+                return Math.random() < 0.8 && winning ? winning : randomValidMove(a, b);
+            }
+            // Expert: always optimal
+            return winning || randomValidMove(a, b);
+        }
+
+        // ── Rendering ──
+
+        function renderPile(containerId, countId, panelId, count) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const stick = document.createElement('div');
+                stick.className = 'stick stick-pop';
+                stick.style.animationDelay = `${i * 0.015}s`;
+                container.appendChild(stick);
+            }
+            document.getElementById(countId).textContent = count;
+        }
+
+        function renderPiles() {
+            renderPile('pileASticks', 'pileACount', 'pileAPanel', game.pileA);
+            renderPile('pileBSticks', 'pileBCount', 'pileBPanel', game.pileB);
+
+            // Highlight active pile(s)
+            document.getElementById('pileAPanel').classList.toggle('active',
+                game.moveType === 'A' || game.moveType === 'AB');
+            document.getElementById('pileBPanel').classList.toggle('active',
+                game.moveType === 'B' || game.moveType === 'AB');
+        }
+
+        function renderButtons() {
+            const group = document.getElementById('buttonGroup');
+            group.innerHTML = '';
+
+            let max;
+            if (game.moveType === 'A')  max = game.pileA;
+            if (game.moveType === 'B')  max = game.pileB;
+            if (game.moveType === 'AB') max = Math.min(game.pileA, game.pileB);
+
+            max = Math.max(0, max);
+
+            // Cap display at 12 buttons; beyond that show a number input
+            const showInput = max > 12;
+            if (showInput) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = 1; input.max = max;
+                input.value = Math.min(game.selectedAmount, max);
+                input.style.width = '100%';
+                input.oninput = () => {
+                    const v = Math.min(Math.max(1, parseInt(input.value) || 1), max);
+                    game.selectedAmount = v;
+                    updateTakeLabel();
+                };
+                group.appendChild(input);
+                game.selectedAmount = Math.min(game.selectedAmount, max);
+            } else {
+                if (game.selectedAmount > max) game.selectedAmount = max || 1;
+                for (let i = 1; i <= max; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'select-btn' + (i === game.selectedAmount ? ' selected' : '');
+                    btn.textContent = i;
+                    btn.onclick = () => { game.selectedAmount = i; renderButtons(); updateTakeLabel(); };
+                    group.appendChild(btn);
+                }
+            }
+
+            document.getElementById('amountHint').textContent =
+                max > 0 ? `(max ${max})` : '';
+
+            updateTakeLabel();
+            document.getElementById('takeBtn').disabled = max === 0 || game.isGameOver;
+        }
+
+        function updateTakeLabel() {
+            const a = game.selectedAmount;
+            const labels = {
+                'A':  `Take ${a} from Pile A`,
+                'B':  `Take ${a} from Pile B`,
+                'AB': `Take ${a} from both piles`
+            };
+            document.getElementById('takeBtn').textContent = labels[game.moveType];
+        }
+
+        function selectMoveType(type) {
+            game.moveType = type;
+            document.querySelectorAll('.move-type-btn').forEach(b => {
+                b.classList.toggle('selected', b.dataset.type === type);
+            });
+            game.selectedAmount = 1;
+            renderPiles();
+            renderButtons();
+        }
+
+        // ── Logging ──
+
+        function addLog(message, type = '') {
+            game.logs.push({ message, type });
+            const el = document.getElementById('gameLog');
+            el.innerHTML = game.logs.map(l =>
+                `<div class="log-entry ${l.type}">${l.message}</div>`
+            ).join('');
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function describeMove(move, name) {
+            if (move.type === 'A')  return `${name} took ${move.amount} from Pile A`;
+            if (move.type === 'B')  return `${name} took ${move.amount} from Pile B`;
+            if (move.type === 'AB') return `${name} took ${move.amount} from both piles`;
+        }
+
+        function applyMove(move) {
+            if (move.type === 'A' || move.type === 'AB') game.pileA -= move.amount;
+            if (move.type === 'B' || move.type === 'AB') game.pileB -= move.amount;
+        }
+
+        // ── Game flow ──
+
+        function checkWin() {
+            return game.pileA === 0 && game.pileB === 0;
+        }
+
+        function playerTake() {
+            if (game.isGameOver) return;
+
+            const move = { type: game.moveType, amount: game.selectedAmount };
+            applyMove(move);
+            addLog(describeMove(move, game.playerName), 'player');
+            renderPiles();
+
+            if (checkWin()) {
+                addLog(`${game.playerName} wins!`, 'win');
+                game.playerScore++;
+                document.getElementById('playerScore').textContent = game.playerScore;
+                endGame();
+                return;
+            }
+
+            document.getElementById('takeBtn').disabled = true;
+
+            setTimeout(() => {
+                const move = botMove(game.pileA, game.pileB);
+                applyMove(move);
+                addLog(describeMove(move, 'WythBot'), 'bot');
+                renderPiles();
+
+                if (checkWin()) {
+                    addLog('WythBot wins!', 'win');
+                    game.botScore++;
+                    document.getElementById('botScore').textContent = game.botScore;
+                    endGame();
+                } else {
+                    renderButtons();
+                }
+            }, 900);
+        }
+
+        function endGame() {
+            game.isGameOver = true;
+            document.getElementById('takeBtn').classList.add('hidden');
+            document.getElementById('newGameBtn').classList.remove('hidden');
+        }
+
+        function newGame() {
+            // Randomise starting piles: A in [5,12], B in [A+1, A+8]
+            const a = Math.floor(Math.random() * 8) + 5;
+            const b = a + Math.floor(Math.random() * 8) + 1;
+            game.pileA = a;
+            game.pileB = b;
+            game.isGameOver = false;
+            game.moveType = 'A';
+            game.selectedAmount = 1;
+            game.logs = [];
+
+            document.getElementById('gameLog').innerHTML = '<div class="log-entry">No moves yet...</div>';
+            document.getElementById('takeBtn').classList.remove('hidden');
+            document.getElementById('newGameBtn').classList.add('hidden');
+
+            document.querySelectorAll('.move-type-btn').forEach(b => {
+                b.classList.toggle('selected', b.dataset.type === 'A');
+            });
+
+            renderPiles();
+            renderButtons();
+        }
+
+        document.getElementById('takeBtn').onclick = playerTake;
+        document.getElementById('newGameBtn').onclick = newGame;
+        document.getElementById('difficulty').onchange = e => { game.difficulty = e.target.value; };
+        document.getElementById('playerName').oninput = e => {
+            game.playerName = e.target.value;
+            document.getElementById('playerLabel').textContent = e.target.value;
+        };
+
+        renderPiles();
+        renderButtons();
+    </script>
+</body>
+</html>
