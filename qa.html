@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Q&amp;A — Mods by JeHathor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    .qa-list { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .qa-item {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .qa-item:hover { border-color: rgba(201,168,76,0.5); }
+
+    .qa-question {
+      width: 100%;
+      background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem;
+      padding: 1.2rem 1.6rem;
+      text-align: left;
+    }
+    .qa-question-text {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem; color: var(--gold-light);
+      letter-spacing: 0.04em; line-height: 1.4;
+    }
+    .qa-chevron {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      border-right: 1.5px solid var(--gold);
+      border-bottom: 1.5px solid var(--gold);
+      transform: rotate(45deg);
+      transition: transform 0.3s, border-color 0.3s;
+      margin-right: 4px;
+    }
+    .qa-item.open .qa-chevron { transform: rotate(-135deg); }
+
+    .qa-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s;
+      padding: 0 1.6rem;
+    }
+    .qa-item.open .qa-answer {
+      max-height: 400px;
+      padding: 0 1.6rem 1.4rem;
+    }
+
+    .qa-answer ol {
+      list-style: none;
+      counter-reset: steps;
+      display: flex; flex-direction: column; gap: 0.7rem;
+    }
+    .qa-answer ol li {
+      counter-increment: steps;
+      display: flex; align-items: flex-start; gap: 0.9rem;
+      font-size: 0.84rem; line-height: 1.7;
+    }
+    .qa-answer ol li::before {
+      content: counter(steps);
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      color: var(--gold);
+      border: 1px solid var(--border-hover);
+      width: 1.6rem; height: 1.6rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+
+    .qa-note {
+      font-size: 0.78rem; font-style: italic;
+      opacity: 0.55; margin-top: 0.6rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-rule"><div class="diamond"></div><h1>Mods by JeHathor</h1><div class="diamond"></div></div>
+    <p class="subtitle">Game Modifications &amp; Community Content</p>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="mods-swbf2.html">SWBF II</a>
+    <a href="mods-aom.html">Age of Mythology</a>
+    <a href="qa.html" class="active">Q&amp;A</a>
+    <a href="linktree.html">Links</a>
+  </nav>
+
+  <main>
+    <p class="page-title anim d1">Frequently Asked Questions</p>
+    <p class="page-intro anim d2">Installation guides for all supported games and mods.</p>
+
+    <div class="qa-list anim d3">
+
+      <div class="qa-item">
+        <button class="qa-question" aria-expanded="false">
+          <span class="qa-question-text">How do I install a map for SWBF2 (2005)?</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer" role="region">
+          <ol>
+            <li>Locate the folder where your <code>BattlefrontII.exe</code> is stored.</li>
+            <li>Create a new subfolder inside it and name it <strong>addon</strong>.</li>
+            <li>Extract the downloaded <code>.zip</code> files into the new <strong>addon</strong> folder.</li>
+            <li>Launch Battlefront II — and enjoy!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question" aria-expanded="false">
+          <span class="qa-question-text">How do I install a mod for AoM: Extended Edition?</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer" role="region">
+          <ol>
+            <li>Log in to your Steam account.</li>
+            <li>Browse to the Steam Workshop page of the mod.</li>
+            <li>Click the <strong>Subscribe</strong> button.</li>
+            <li>Launch Age of Mythology: Extended Edition — and enjoy!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa-item">
+        <button class="qa-question" aria-expanded="false">
+          <span class="qa-question-text">How do I install Epic Mod II for AoM: The Titans?</span>
+          <span class="qa-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="qa-answer" role="region">
+          <ol>
+            <li>Run the installer.</li>
+            <li>Follow the on-screen instructions, including any troubleshooting steps.</li>
+            <li>Launch the new <code>AOMX_HD.exe</code> — and enjoy!</li>
+          </ol>
+          <p class="qa-note">The mod starts via a separate executable so your original installation stays completely untouched.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>&copy; JeHathor &nbsp;·&nbsp; Hosted on GitHub Pages</footer>
+
+  <script>
+    document.querySelectorAll('.qa-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.qa-item');
+        const isOpen = item.classList.contains('open');
+        // close all
+        document.querySelectorAll('.qa-item').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.qa-question').setAttribute('aria-expanded', 'false');
+        });
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

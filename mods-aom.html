@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Age of Mythology Mods — JeHathor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    /* ── Mod grid ── */
+    .mod-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mod-card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      display: flex; flex-direction: column;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      overflow: hidden;
+    }
+    .mod-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(201,168,76,0.12);
+    }
+
+    .mod-card-thumb {
+      width: 100%; height: 140px; object-fit: cover;
+      display: block;
+      filter: saturate(0.65) brightness(0.75);
+      transition: filter 0.35s;
+      background: linear-gradient(135deg, #1a1000, #2e1f00);
+    }
+    .mod-card:hover .mod-card-thumb { filter: saturate(1) brightness(0.95); }
+
+    .mod-card-body { padding: 1rem 1.1rem 1.2rem; flex: 1; display: flex; flex-direction: column; }
+    .mod-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem; color: var(--gold-light);
+      letter-spacing: 0.04em; margin-bottom: 0.35rem;
+    }
+    .mod-card-desc { font-size: 0.76rem; opacity: 0.6; line-height: 1.6; flex: 1; }
+    .mod-card-link {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gold);
+      margin-top: 0.9rem; transition: letter-spacing 0.3s;
+    }
+    .mod-card:hover .mod-card-link { letter-spacing: 0.22em; }
+
+    /* ── Featured / large card ── */
+    .mod-featured {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 1.6rem 1.8rem;
+      margin-bottom: 1.2rem;
+      transition: border-color 0.3s;
+    }
+    .mod-featured:hover { border-color: rgba(201,168,76,0.5); }
+    .mod-featured-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem; color: var(--gold-light);
+      letter-spacing: 0.06em; margin-bottom: 0.6rem;
+    }
+    .mod-featured-body { font-size: 0.82rem; line-height: 1.8; opacity: 0.7; }
+    .mod-featured-body a { color: var(--gold); text-decoration: none; }
+    .mod-featured-body a:hover { text-decoration: underline; }
+
+    /* ── Resource links ── */
+    .resource-row {
+      display: flex; flex-wrap: wrap; gap: 0.9rem;
+      margin: 0.5rem 0 1rem;
+    }
+    .resource-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none;
+      border: 1px solid var(--border); padding: 0.6rem 1.2rem;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .resource-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+
+    /* ── Cross-link banner ── */
+    .cross-link {
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1px solid var(--border); padding: 1rem 1.4rem;
+      text-decoration: none; color: var(--text);
+      background: var(--panel); margin-bottom: 2rem;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .cross-link:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+    .cross-link span { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--gold-light); }
+    .cross-link em { font-style: normal; font-size: 0.68rem; opacity: 0.55; display: block; margin-top: 0.2rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-rule"><div class="diamond"></div><h1>Mods by JeHathor</h1><div class="diamond"></div></div>
+    <p class="subtitle">Game Modifications &amp; Community Content</p>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="mods-swbf2.html">SWBF II</a>
+    <a href="mods-aom.html" class="active">Age of Mythology</a>
+    <a href="qa.html">Q&amp;A</a>
+    <a href="linktree.html">Links</a>
+  </nav>
+
+  <main>
+    <p class="page-title anim d1">Age of Mythology</p>
+    <p class="page-intro anim d2">Random maps, overhauls, AI mods, and more — spanning Retold, Extended Edition, and The Titans.</p>
+
+    <a class="cross-link anim d2" href="mods-swbf2.html">
+      <div><span>Also see: Star Wars Battlefront II (2005)</span><em>Map addons &amp; modding tools</em></div>
+      <span style="font-size:1rem; opacity:0.6;">→</span>
+    </a>
+
+    <!-- ═══════════════ RETOLD ═══════════════ -->
+    <div class="divider anim d2"><span>◆</span></div>
+    <p class="section-label anim d2">AoM Retold — Random Maps</p>
+
+    <div class="resource-row anim d3">
+      <a class="resource-btn" href="https://jehathor.github.io/AoM-Retold/RetoldFunctions.html" target="_blank" rel="noopener">Retold Code Reference</a>
+      <a class="resource-btn" href="https://drive.google.com/file/d/1Mi_RZAXEvI2sCmGrERBSWfuCtFB0h2cA/view" target="_blank" rel="noopener">Reshade Preset (Retold)</a>
+    </div>
+
+    <div class="mod-grid anim d3">
+
+      <a class="mod-card" href="https://www.ageofempires.com/mods/details/286937" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#0d1a0d,#1a3d1a);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Retold Random Maps Collection</div>
+          <div class="mod-card-desc">A curated pack of custom random maps for AoM Retold.</div>
+          <div class="mod-card-link">View on AoE Mods →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://www.ageofempires.com/mods/details/287273" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#001a0d,#003320);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Wild Lake</div>
+          <div class="mod-card-desc">Dense wilderness map with a central contested lake.</div>
+          <div class="mod-card-link">View on AoE Mods →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://www.ageofempires.com/mods/details/286750" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#0d0d2a,#1a1a4d);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Atlantis</div>
+          <div class="mod-card-desc">Mythic island map inspired by the lost continent.</div>
+          <div class="mod-card-link">View on AoE Mods →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://www.ageofempires.com/mods/details/315442" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#1a1000,#3d2a00);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Spartan Pass</div>
+          <div class="mod-card-desc">Narrow mountain chokepoint map — control the pass, control the game.</div>
+          <div class="mod-card-link">View on AoE Mods →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://www.ageofempires.com/mods/details/314841" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#0d1a00,#1f3300);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Mainland</div>
+          <div class="mod-card-desc">Open landmass map favouring aggressive expansion.</div>
+          <div class="mod-card-link">View on AoE Mods →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://www.ageofempires.com/mods/details/315317" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#001333,#002655);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Tiny Water</div>
+          <div class="mod-card-desc">Compact water map for fast, intense naval battles.</div>
+          <div class="mod-card-link">View on AoE Mods →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="#" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#0a1a00,#163300);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Verdant Rift</div>
+          <div class="mod-card-desc">Lush valley map split by a winding river.</div>
+          <div class="mod-card-link">Coming Soon</div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- ═══════════════ TITANS / EE ═══════════════ -->
+    <div class="divider anim d3"><span>◆</span></div>
+    <p class="section-label anim d3">The Titans — Epic Mod II</p>
+
+    <div class="mod-featured anim d3">
+      <div class="mod-featured-title">Age of Mythology — Epic Mod II</div>
+      <p class="mod-featured-body">
+        A growing collection and expansion of several mods — probably the best-looking conversion for AoM: The Titans. The mod leaves the main game completely untouched and is initialised via a separate application, letting you switch back to a clean install in seconds.
+      </p>
+      <p class="mod-featured-body" style="margin-top:0.7rem;">
+        <a href="https://www.moddb.com/mods/age-of-mythology-epic-mod-ii/downloads/epic-mod-x-mas-update-2022" target="_blank" rel="noopener">Download on ModDB →</a>
+      </p>
+    </div>
+
+    <div class="divider anim d3"><span>◆</span></div>
+    <p class="section-label anim d3">Extended Edition — Steam Workshop</p>
+
+    <div class="resource-row anim d4">
+      <a class="resource-btn" href="https://drive.google.com/file/d/161BH1pq7JDMVFjO-7P0QCDlCLNp3cS8d/view" target="_blank" rel="noopener">Reshade Preset (EE)</a>
+    </div>
+
+    <div class="mod-grid anim d4">
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2378309786" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#00001a,#00003d);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Antisthenes AI</div>
+          <div class="mod-card-desc">An improved AI opponent for Extended Edition.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2383049664" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#001a26,#003344);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Winter Random Map</div>
+          <div class="mod-card-desc">Snow-blanketed terrain with frozen waterways.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2528846361" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#1a0500,#3d1000);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Volcanic Eruption Map</div>
+          <div class="mod-card-desc">Dynamic lava landscape — fight before it consumes everything.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2434052772" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#1a1000,#332000);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Scenario Collection</div>
+          <div class="mod-card-desc">A bundle of hand-crafted scenarios for Extended Edition.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2985084889" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#0d0d1a,#1a1a33);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Mega Random Nomad</div>
+          <div class="mod-card-desc">Large-scale nomad-style map — no starting town centre.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2368596218" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#001a00,#003300);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Tiny Freak Style v2-15</div>
+          <div class="mod-card-desc">Ultra-compact map for chaotic early-game action.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2426821720" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#001333,#002655);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Tiny Water 1.7</div>
+          <div class="mod-card-desc">Compact naval arena for EE — every shoreline counts.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://steamcommunity.com/sharedfiles/filedetails/?id=2547849334" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#1a0d00,#331a00);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Chinese Techtree Recolored</div>
+          <div class="mod-card-desc">Visual overhaul for the Chinese civilisation UI.</div>
+          <div class="mod-card-link">View on Steam →</div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- ═══════════════ RETURN OF THE GODS ═══════════════ -->
+    <div class="divider anim d4"><span>◆</span></div>
+    <p class="section-label anim d4">The Return of the Gods</p>
+
+    <div class="mod-featured anim d4">
+      <div class="mod-featured-title">The Return of the Gods — Beta</div>
+      <p class="mod-featured-body">
+        A new mod project for AoM and its expansions, building a world for ancient American civilisations — portraying their history, customs, beliefs, warfare, and of course, mythology.
+      </p>
+      <p class="mod-featured-body" style="margin-top:0.7rem;">
+        <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2759618117" target="_blank" rel="noopener">View on Steam →</a>
+      </p>
+    </div>
+
+    <!-- ═══════════════ TOOLS ═══════════════ -->
+    <div class="divider anim d4"><span>◆</span></div>
+    <p class="section-label anim d4">Tools, Games &amp; More</p>
+
+    <div class="mod-grid anim d5">
+
+      <a class="mod-card" href="https://jehathor.itch.io/seabattle" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#001a26,#00334d);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">Sea Battle (Mini Game)</div>
+          <div class="mod-card-desc">A standalone browser game — the perfect second pastime between sessions.</div>
+          <div class="mod-card-link">Play on Itch.io →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://jehathor.itch.io/aom-unit-stats-explorer-retold" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#1a1000,#2e1f00);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">AoM Unit Stats Explorer — Retold</div>
+          <div class="mod-card-desc">Interactive browser tool for exploring unit stats in AoM Retold.</div>
+          <div class="mod-card-link">Open on Itch.io →</div>
+        </div>
+      </a>
+
+      <a class="mod-card" href="https://legacy-of-mythology.creator-spring.com" target="_blank" rel="noopener">
+        <div class="mod-card-thumb" style="background:linear-gradient(135deg,#1a0500,#330a00);"></div>
+        <div class="mod-card-body">
+          <div class="mod-card-title">AoM-Related Merchandise</div>
+          <div class="mod-card-desc">Clothing and goods from Legacy of Mythology.</div>
+          <div class="mod-card-link">Browse Shop →</div>
+        </div>
+      </a>
+
+    </div>
+
+  </main>
+
+  <footer>&copy; JeHathor &nbsp;·&nbsp; Hosted on GitHub Pages</footer>
+
+</body>
+</html>

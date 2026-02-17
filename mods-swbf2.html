@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SWBF2 Mods — JeHathor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    /* ── Mod list ── */
+    .mod-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+
+    .mod-entry {
+      display: flex; align-items: center; gap: 1.2rem;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      text-decoration: none; color: inherit;
+      transition: border-color 0.3s, background 0.3s, transform 0.28s;
+      overflow: hidden;
+      padding: 0;
+    }
+    .mod-entry:hover {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.05);
+      transform: translateX(4px);
+    }
+
+    .mod-entry-thumb {
+      width: 110px; min-width: 110px; height: 80px;
+      object-fit: cover;
+      filter: saturate(0.6) brightness(0.7);
+      transition: filter 0.3s;
+      background: linear-gradient(135deg, #000a1a, #001433);
+    }
+    .mod-entry:hover .mod-entry-thumb { filter: saturate(1) brightness(0.9); }
+
+    .mod-entry-body { padding: 0.9rem 1.2rem 0.9rem 0; flex: 1; }
+    .mod-entry-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem; color: var(--gold-light);
+      letter-spacing: 0.04em; margin-bottom: 0.3rem;
+    }
+    .mod-entry-desc { font-size: 0.76rem; opacity: 0.6; line-height: 1.6; }
+    .mod-entry-tag {
+      display: inline-block; margin-top: 0.5rem;
+      font-family: 'Cinzel', serif; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); opacity: 0.75;
+    }
+
+    /* NEW badge */
+    .badge-new {
+      display: inline-block;
+      font-family: 'Cinzel', serif; font-size: 0.58rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--dark); background: var(--gold);
+      padding: 0.15rem 0.5rem; margin-left: 0.6rem;
+      vertical-align: middle;
+    }
+
+    /* ── Cross-link ── */
+    .cross-link {
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1px solid var(--border); padding: 1rem 1.4rem;
+      text-decoration: none; color: var(--text);
+      background: var(--panel); margin-bottom: 2rem;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .cross-link:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+    .cross-link span { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--gold-light); }
+    .cross-link em { font-style: normal; font-size: 0.68rem; opacity: 0.55; display: block; margin-top: 0.2rem; }
+
+    /* ── Resource ── */
+    .resource-row {
+      display: flex; flex-wrap: wrap; gap: 0.9rem;
+      margin: 0 0 1.5rem;
+    }
+    .resource-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--gold);
+      text-decoration: none;
+      border: 1px solid var(--border); padding: 0.6rem 1.2rem;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .resource-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+
+    /* ── Tool entry ── */
+    .tool-entry {
+      border: 1px solid var(--border); background: var(--panel);
+      padding: 1.2rem 1.5rem;
+      text-decoration: none; color: inherit;
+      display: block; transition: border-color 0.3s;
+    }
+    .tool-entry:hover { border-color: rgba(201,168,76,0.5); }
+    .tool-entry-title { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--gold-light); margin-bottom: 0.35rem; }
+    .tool-entry-desc  { font-size: 0.78rem; opacity: 0.65; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-rule"><div class="diamond"></div><h1>Mods by JeHathor</h1><div class="diamond"></div></div>
+    <p class="subtitle">Game Modifications &amp; Community Content</p>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="mods-swbf2.html" class="active">SWBF II</a>
+    <a href="mods-aom.html">Age of Mythology</a>
+    <a href="qa.html">Q&amp;A</a>
+    <a href="linktree.html">Links</a>
+  </nav>
+
+  <main>
+    <p class="page-title anim d1">Star Wars Battlefront II (2005)</p>
+    <p class="page-intro anim d2">Custom maps, planet addons, and modding tools for the classic 2005 Battlefront experience.</p>
+
+    <a class="cross-link anim d2" href="mods-aom.html">
+      <div><span>Also see: Age of Mythology</span><em>Random maps, overhauls &amp; tools</em></div>
+      <span style="font-size:1rem; opacity:0.6;">→</span>
+    </a>
+
+    <!-- ═══════════════ MAP DOWNLOADS ═══════════════ -->
+    <p class="section-label anim d2">Map Downloads</p>
+
+    <div class="resource-row anim d3">
+      <a class="resource-btn" href="https://github.com/PrismaticFlower/shaderpatch/releases" target="_blank" rel="noopener">SleepKiller's Shader Patch</a>
+      <a class="resource-btn" href="https://drive.google.com/file/d/1el0Aab9ap6s2qyP5YMgUDZCvyE6ThkA0/view?usp=sharing" target="_blank" rel="noopener">JeHathor's Shader Preset</a>
+    </div>
+
+    <div class="mod-list anim d3">
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/ozone-sun-beach" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#1a1000,#332000);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Ozone: Sun Beach <span class="badge-new">New</span></div>
+          <div class="mod-entry-desc">A Battlefront map with a summer feeling — sandy shores meet blaster fire.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/felucia-at-night" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#001a0d,#003320);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Felucia at Night</div>
+          <div class="mod-entry-desc">The fungal jungles of Felucia reimagined under a dark, bioluminescent sky.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/sw-battlefront-ii-galaxy-of-duels-2" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#1a001a,#330033);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Galaxy of Duels 2</div>
+          <div class="mod-entry-desc">Highly optimised for epic lightsaber combat. Grab your saber and start duelling!</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/outer-rim-prison-ship-v1" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#0d0d0d,#1a1a1a);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Outer Rim: Prison Ship V1</div>
+          <div class="mod-entry-desc">Claustrophobic corridor combat aboard a prison vessel in the Outer Rim.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/kashyyyk-island-village" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#001a00,#003300);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Kashyyyk: Island Village</div>
+          <div class="mod-entry-desc">Wookiee island settlement — jungle warfare on the shores of Kashyyyk.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/anoth" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#1a1a00,#333300);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Anoth</div>
+          <div class="mod-entry-desc">An original planet map set on the remote world of Anoth.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/galactic-counter-strike-dust-ii" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#1a0a00,#331500);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Galactic Counter-Strike: Dust II</div>
+          <div class="mod-entry-desc">The legendary CS map transported to a galaxy far, far away.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/raxus-factory-hall" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#0d0d00,#1a1a00);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Raxus: Factory Hall</div>
+          <div class="mod-entry-desc">Industrial close-quarters map set inside the scrapyards of Raxus Prime.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/tatooine-multiple-times-of-day" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#1a0e00,#332000);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Tatooine: Multiple Times of Day</div>
+          <div class="mod-entry-desc">Tatooine across dawn, midday, and dusk — same map, very different atmosphere.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/endor-at-night" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#001a00,#002600);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Endor at Night</div>
+          <div class="mod-entry-desc">The Endor forest moon after dark — moon shadows and ambushes.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+      <a class="mod-entry" href="https://www.moddb.com/games/star-wars-battlefront-ii/addons/vanqor-map-12" target="_blank" rel="noopener">
+        <div class="mod-entry-thumb" style="background:linear-gradient(135deg,#1a0500,#330a00);"></div>
+        <div class="mod-entry-body">
+          <div class="mod-entry-title">Vanqor Map 1.2</div>
+          <div class="mod-entry-desc">Rocky, hostile terrain on the planet Vanqor — treacherous ground for both sides.</div>
+          <span class="mod-entry-tag">ModDB →</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- ═══════════════ TOOLS ═══════════════ -->
+    <div class="divider anim d4"><span>◆</span></div>
+    <p class="section-label anim d4">Modding Tools</p>
+
+    <a class="tool-entry anim d4" href="https://www.moddb.com/games/star-wars-battlefront/downloads/simple-flag-tool" target="_blank" rel="noopener">
+      <div class="tool-entry-title">Simple Flag Tool</div>
+      <div class="tool-entry-desc">Edit <code>.msh</code> flags quickly and easily — an essential utility for SWBF2 mod development. Download via ModDB.</div>
+    </a>
+
+  </main>
+
+  <footer>&copy; JeHathor &nbsp;·&nbsp; Hosted on GitHub Pages</footer>
+
+</body>
+</html>
