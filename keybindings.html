@@ -761,7 +761,7 @@ function parseDefaultXML(xmlText) {
 async function loadDefaultKeymap() {
   const statusEl = document.getElementById('defaultStatus');
   try {
-    const resp = await fetch('default_keymap.xml');
+    const resp = await fetch('assets/default_keymap.xml');
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const text = await resp.text();
     DEFAULT_BINDINGS = parseDefaultXML(text);
