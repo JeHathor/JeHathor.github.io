@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AoM:Retold Keybinding Visualiser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --panel: #12161e;
+    --border: #1e2535;
+    --key-bg: #181d28;
+    --key-top: #1e2636;
+    --key-border: #2a3347;
+    --key-shadow: #090c12;
+    --text: #c8d4e8;
+    --text-dim: #4a5570;
+    --accent: #e8a030;
+    --accent2: #3a8fd4;
+    --accent3: #5cb87a;
+    --def-bg: #0e1a2a; --def-top: #132236; --def-border: #2a4a7a; --def-glow: rgba(58,120,200,0.15);
+    --cust-bg: #1a2810; --cust-top: #223318; --cust-border: #4a8040; --cust-glow: rgba(80,180,80,0.2);
+    --both-bg: #1a1a0a; --both-top: #28281a; --both-border: #a08030; --both-glow: rgba(200,160,40,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 40px;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(30,38,54,0.35) 1px,transparent 1px),
+                      linear-gradient(90deg,rgba(30,38,54,0.35) 1px,transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .wrapper { position: relative; z-index: 1; width: 100%; max-width: 1120px; }
+
+  header { text-align: center; margin-bottom: 24px; }
+  header h1 {
+    font-size: 2rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    background: linear-gradient(90deg,var(--accent),#f0d080,var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  header p { color: var(--text-dim); font-size: 0.95rem; letter-spacing: 0.05em; margin-top: 4px; }
+
+  .upload-zone {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 16px 24px;
+    text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 20px; background: var(--panel);
+  }
+  .upload-zone:hover { border-color: var(--accent); background: #161b25; }
+  .upload-zone.loaded { border-color: var(--cust-border); border-style: solid; }
+  .upload-zone input { display: none; }
+  .upload-zone label { cursor: pointer; font-size: 0.95rem; letter-spacing: 0.05em; }
+  .upload-zone .file-name { color: var(--accent3); font-family: 'Share Tech Mono'; font-size: 0.85rem; margin-top: 5px; }
+
+  .modifier-bar { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .mod-btn {
+    background: var(--key-top); border: 1px solid var(--key-border); color: var(--text-dim);
+    padding: 6px 20px; border-radius: 6px; font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem; font-weight: 600; letter-spacing: 0.1em; cursor: pointer;
+    transition: all 0.15s; text-transform: uppercase;
+  }
+  .mod-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mod-btn.active { background:#1a001a; border-color:#c060d0; color:#c060d0; box-shadow:0 0 10px rgba(180,80,200,0.3); }
+
+  .legend { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-dim); }
+  .legend-swatch { width:28px; height:18px; border-radius:4px; border:1px solid var(--key-border); background:linear-gradient(to bottom,var(--key-top),var(--key-bg)); }
+  .legend-swatch.def  { background:linear-gradient(to bottom,var(--def-top), var(--def-bg));  border-color:var(--def-border);  box-shadow:0 0 5px var(--def-glow); }
+  .legend-swatch.cust { background:linear-gradient(to bottom,var(--cust-top),var(--cust-bg)); border-color:var(--cust-border); box-shadow:0 0 5px var(--cust-glow); }
+  .legend-swatch.both { background:linear-gradient(to bottom,var(--both-top),var(--both-bg)); border-color:var(--both-border); box-shadow:0 0 5px var(--both-glow); }
+
+  .keyboard-wrap {
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:20px 20px 16px; margin-bottom:22px; overflow-x:auto;
+  }
+  .keyboard { display:flex; flex-direction:column; gap:5px; min-width:780px; }
+  .kb-row { display:flex; gap:5px; align-items:flex-end; }
+
+  .key {
+    position:relative; display:flex; flex-direction:column;
+    justify-content:flex-start; align-items:flex-start;
+    padding:5px 6px 4px; min-width:52px; height:52px;
+    background:linear-gradient(to bottom,var(--key-top),var(--key-bg));
+    border:1px solid var(--key-border); border-bottom:3px solid var(--key-shadow);
+    border-radius:6px; cursor:default; overflow:hidden; user-select:none;
+    transition:background 0.12s, border-color 0.12s, box-shadow 0.12s;
+  }
+  .key .key-label { font-family:'Share Tech Mono'; font-size:0.68rem; color:var(--text-dim); line-height:1; }
+  .key .binding-label {
+    font-family:'Rajdhani'; font-size:0.6rem; font-weight:600; line-height:1.1; margin-top:2px;
+    overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; letter-spacing:0.01em;
+  }
+  .key.def-only  { background:linear-gradient(to bottom,var(--def-top), var(--def-bg));  border-color:var(--def-border);  border-bottom-color:#0a1420; box-shadow:0 0 7px var(--def-glow); }
+  .key.cust-only { background:linear-gradient(to bottom,var(--cust-top),var(--cust-bg)); border-color:var(--cust-border); border-bottom-color:#111e09; box-shadow:0 0 8px var(--cust-glow); }
+  .key.both      { background:linear-gradient(to bottom,var(--both-top),var(--both-bg)); border-color:var(--both-border); border-bottom-color:#120f00; box-shadow:0 0 8px var(--both-glow); }
+  .key.def-only  .key-label { color:#5a8abd; } .key.def-only  .binding-label { color:#5a9fd4; }
+  .key.cust-only .key-label { color:#8fc870; } .key.cust-only .binding-label { color:#7ec860; }
+  .key.both      .key-label { color:#c8a040; } .key.both      .binding-label { color:#d4aa50; }
+
+  /* Active modifier key highlight */
+  .key.mod-active-shift,
+  .key.mod-active-control,
+  .key.mod-active-alt,
+  .key.mod-active-tab   { background:linear-gradient(to bottom,#200028,#140018); border-color:#c060d0; border-bottom-color:#0a0010; box-shadow:0 0 12px rgba(180,80,200,0.45); }
+  .key.mod-active-shift   .key-label,
+  .key.mod-active-control .key-label,
+  .key.mod-active-alt     .key-label,
+  .key.mod-active-tab     .key-label { color:#c060d0; }
+
+  .key.w15  { min-width:79px; }  .key.w175 { min-width:92px; }
+  .key.w2   { min-width:109px; } .key.w225 { min-width:119px; }
+  .key.w275 { min-width:145px; } .key.w625 { min-width:330px; }
+  .key.fkey { min-width:44px; height:44px; }
+  .fgap { width:22px; flex-shrink:0; }
+  .key:hover { z-index:10; }
+
+  .tooltip {
+    position:fixed; background:#080b10; border:1px solid var(--accent); border-radius:9px;
+    padding:10px 14px; max-width:300px; pointer-events:none; z-index:1000; display:none; font-size:0.88rem;
+  }
+  .tooltip.visible { display:block; }
+  .tooltip .tip-key { font-family:'Share Tech Mono'; font-size:0.78rem; color:var(--accent); margin-bottom:6px; }
+  .tip-section { margin-top:5px; }
+  .tip-section-label { font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px; }
+  .tip-section-label.def  { color:var(--def-border); }
+  .tip-section-label.cust { color:var(--cust-border); }
+  .tip-action { color:var(--text); font-weight:600; line-height:1.35; }
+  .tip-meta   { color:var(--text-dim); font-size:0.75rem; }
+
+  .tabs-row { display:flex; gap:3px; margin-bottom:0; }
+  .src-tab {
+    padding:7px 16px; font-size:0.8rem; font-weight:700; letter-spacing:0.08em;
+    text-transform:uppercase; cursor:pointer; border:1px solid var(--border);
+    border-bottom:none; border-radius:6px 6px 0 0; color:var(--text-dim); background:#0f1319;
+    transition:all 0.15s;
+  }
+  .src-tab.active                  { background:var(--panel); color:var(--text); }
+  .src-tab.tab-all.active          { color:var(--accent); }
+  .src-tab.tab-def.active          { color:#5a9fd4; }
+  .src-tab.tab-cust.active         { color:#7ec860; }
+
+  .bindings-panel { background:var(--panel); border:1px solid var(--border); border-radius:0 6px 14px 14px; overflow:hidden; }
+  .bindings-header {
+    padding:12px 20px; border-bottom:1px solid var(--border);
+    font-size:0.9rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--accent); display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .count-badge { border-radius:20px; padding:1px 10px; font-size:0.78rem; border:1px solid; }
+  .count-badge.def  { background:#0e1a2a; border-color:var(--def-border);  color:#5a9fd4; }
+  .count-badge.cust { background:#1a2810; border-color:var(--cust-border); color:#7ec860; }
+
+  .group-section { border-bottom:1px solid var(--border); }
+  .group-section:last-child { border-bottom:none; }
+  .group-title {
+    padding:8px 20px; font-size:0.78rem; font-weight:700; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--text-dim); background:#0f1319;
+    cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  }
+  .group-title:hover { color:var(--text); }
+  .group-title .arrow { transition:transform 0.2s; }
+  .group-title.collapsed .arrow { transform:rotate(-90deg); }
+
+  .binding-row {
+    display:grid; grid-template-columns:200px 1fr; gap:8px;
+    padding:6px 20px; border-top:1px solid rgba(30,37,53,0.5); align-items:center;
+  }
+  .binding-row.is-cust { border-left:2px solid var(--cust-border); }
+  .binding-row.is-def  { border-left:2px solid var(--def-border); }
+  .binding-row.is-overridden { opacity:0.45; }
+
+  .binding-chord { font-family:'Share Tech Mono'; font-size:0.8rem; display:flex; gap:3px; flex-wrap:wrap; align-items:center; }
+  .chord-key { background:var(--key-top); border:1px solid var(--key-border); border-radius:4px; padding:1px 6px; font-size:0.76rem; white-space:nowrap; }
+  .chord-key.cust { background:#1a2810; border-color:var(--cust-border); color:#7ec860; }
+  .chord-key.def  { background:#0e1a2a; border-color:var(--def-border);  color:#5a9fd4; }
+  .overridden-tag { font-size:0.65rem; color:var(--text-dim); background:#1a1500; border:1px solid #443300; border-radius:3px; padding:0 5px; margin-left:4px; }
+
+  .binding-name { font-size:0.88rem; color:var(--text); }
+  .binding-ctx  { font-size:0.72rem; color:var(--text-dim); }
+
+  .search-bar {
+    display:flex; align-items:center; gap:10px; margin-bottom:20px;
+  }
+  .search-bar input {
+    flex:1; background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    color:var(--text); font-family:'Rajdhani',sans-serif; font-size:1rem; padding:8px 14px;
+    outline:none; transition:border-color 0.15s;
+  }
+  .search-bar input:focus { border-color:var(--accent); }
+  .search-bar input::placeholder { color:var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <h1>⚡ Keybinding Visualiser</h1>
+    <p>Age of Mythology: Retold &mdash; default_keymap.xml + localkeybindings.xml map</p>
+  </header>
+
+  <div id="defaultStatus" style="text-align:center;font-size:0.82rem;color:var(--text-dim);margin-bottom:10px;font-family:'Share Tech Mono'">
+    Loading default_keymap.xml…
+  </div>
+
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="xmlFile" accept=".xml">
+    <label for="xmlFile">📂 Drop or click to load your <strong>localkeybindings.xml</strong></label>
+    <div class="file-name" id="fileName">No custom file loaded — showing defaults only</div>
+  </div>
+
+  <div class="modifier-bar">
+    <span style="color:var(--text-dim);font-size:0.82rem;letter-spacing:0.07em;align-self:center;">MODIFIER:</span>
+    <button class="mod-btn active" data-mod="none">None</button>
+    <button class="mod-btn" data-mod="shift">Shift</button>
+    <button class="mod-btn" data-mod="control">Ctrl</button>
+    <button class="mod-btn" data-mod="alt">Alt</button>
+    <button class="mod-btn" data-mod="tab">Tab+</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch"></div>Unbound</div>
+    <div class="legend-item"><div class="legend-swatch def"></div>Default (default_keymap.xml)</div>
+    <div class="legend-item"><div class="legend-swatch cust"></div>Custom (localkeybindings.xml)</div>
+    <div class="legend-item"><div class="legend-swatch both"></div>Overridden: Replaces Default</div>
+  </div>
+
+  <div class="keyboard-wrap">
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍  Filter bindings by name, key, or group…">
+  </div>
+
+  <div class="tabs-row">
+    <div class="src-tab tab-all active" data-tab="all">All</div>
+    <div class="src-tab tab-def"        data-tab="def">Default</div>
+    <div class="src-tab tab-cust"       data-tab="cust">Custom</div>
+  </div>
+  <div class="bindings-panel" id="bindingsPanel">
+    <div class="bindings-header">
+      Bindings
+      <span class="count-badge def"  id="defCount">0 defaults</span>
+      <span class="count-badge cust" id="custCount">0 customs</span>
+    </div>
+    <div id="bindingsList"></div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// DEFAULT_BINDINGS is pre-built from default_keymap.xml at deploy time.
+// To regenerate: re-run the build script with an updated default_keymap.xml.
+let DEFAULT_BINDINGS = [];  // loaded via fetch('default_keymap.xml')
+
+// ─── Keyboard layout ─────────────────────────────────────────────────────────
+const ROWS = [
+  [
+    {id:'esc',label:'Esc',w:''},{id:'__fg1',label:'',w:'fgap'},
+    {id:'f1',label:'F1',w:'fkey'},{id:'f2',label:'F2',w:'fkey'},
+    {id:'f3',label:'F3',w:'fkey'},{id:'f4',label:'F4',w:'fkey'},
+    {id:'__fg2',label:'',w:'fgap'},
+    {id:'f5',label:'F5',w:'fkey'},{id:'f6',label:'F6',w:'fkey'},
+    {id:'f7',label:'F7',w:'fkey'},{id:'f8',label:'F8',w:'fkey'},
+    {id:'__fg3',label:'',w:'fgap'},
+    {id:'f9',label:'F9',w:'fkey'},{id:'f10',label:'F10',w:'fkey'},
+    {id:'f11',label:'F11',w:'fkey'},{id:'f12',label:'F12',w:'fkey'},
+  ],
+  [
+    {id:'backtick',label:'`',w:''},{id:'1',label:'1',w:''},{id:'2',label:'2',w:''},
+    {id:'3',label:'3',w:''},{id:'4',label:'4',w:''},{id:'5',label:'5',w:''},
+    {id:'6',label:'6',w:''},{id:'7',label:'7',w:''},{id:'8',label:'8',w:''},
+    {id:'9',label:'9',w:''},{id:'0',label:'0',w:''},
+    {id:'minus',label:'-',w:''},{id:'equals',label:'=',w:''},
+    {id:'backspace',label:'Bksp',w:'w2'},
+  ],
+  [
+    {id:'tab',label:'Tab',w:'w15'},
+    {id:'q',label:'Q',w:''},{id:'w',label:'W',w:''},{id:'e',label:'E',w:''},
+    {id:'r',label:'R',w:''},{id:'t',label:'T',w:''},{id:'y',label:'Y/Z',w:''},
+    {id:'u',label:'U',w:''},{id:'i',label:'I',w:''},{id:'o',label:'O',w:''},
+    {id:'p',label:'P',w:''},{id:'lbracket',label:'[',w:''},{id:'rbracket',label:']',w:''},
+    {id:'backslash',label:'\\',w:'w15'},
+  ],
+  [
+    {id:'capslock',label:'Caps',w:'w175'},
+    {id:'a',label:'A',w:''},{id:'s',label:'S',w:''},{id:'d',label:'D',w:''},
+    {id:'f',label:'F',w:''},{id:'g',label:'G',w:''},{id:'h',label:'H',w:''},
+    {id:'j',label:'J',w:''},{id:'k',label:'K',w:''},{id:'l',label:'L',w:''},
+    {id:'semicolon',label:';',w:''},{id:'quote',label:"'",w:''},
+    {id:'enter',label:'Enter',w:'w225'},
+  ],
+  [
+    {id:'lshift',label:'Shift',w:'w275'},
+    {id:'z',label:'Z/Y',w:''},{id:'x',label:'X',w:''},{id:'c',label:'C',w:''},
+    {id:'v',label:'V',w:''},{id:'b',label:'B',w:''},{id:'n',label:'N',w:''},
+    {id:'m',label:'M',w:''},{id:'comma',label:',',w:''},{id:'period',label:'.',w:''},
+    {id:'slash',label:'/',w:''},
+    {id:'rshift',label:'Shift',w:'w275'},
+  ],
+  [
+    {id:'lctrl',label:'Ctrl',w:'w15'},{id:'lmeta',label:'⊞',w:''},
+    {id:'lalt',label:'Alt',w:'w15'},
+    {id:'space',label:'Space',w:'w625'},
+    {id:'ralt',label:'Alt',w:'w15'},{id:'rctrl',label:'Ctrl',w:'w15'},
+  ],
+];
+
+const EVENT_TO_KEY = {
+  a:'a',b:'b',c:'c',d:'d',e:'e',f:'f',g:'g',h:'h',
+  i:'i',j:'j',k:'k',l:'l',m:'m',n:'n',o:'o',p:'p',
+  q:'q',r:'r',s:'s',t:'t',u:'u',v:'v',w:'w',x:'x',y:'y',z:'z',
+  f1:'f1',f2:'f2',f3:'f3',f4:'f4',f5:'f5',f6:'f6',
+  f7:'f7',f8:'f8',f9:'f9',f10:'f10',f11:'f11',f12:'f12',
+  space:'space',tab:'tab',esc:'esc',enter:'enter',
+  backspace:'backspace',capslock:'capslock',
+  '1':'1','2':'2','3':'3','4':'4','5':'5',
+  '6':'6','7':'7','8':'8','9':'9','0':'0',
+  minus:'minus',equals:'equals',lbracket:'lbracket',
+  rbracket:'rbracket',backslash:'backslash',
+  semicolon:'semicolon',quote:'quote',
+  comma:'comma',period:'period',slash:'slash',backtick:'backtick',
+  // Symbol aliases used in event strings
+  '.':'period',',':'comma','/':'slash','=':'equals',
+};
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let customBindings = [];   // from localkeybindings.xml (raw, includes bind+unbind)
+let activeModifier = 'none';
+let activeTab      = 'all';
+let searchQuery    = '';
+
+// ─── Parse localkeybindings.xml ───────────────────────────────────────────────
+function parseLocalXML(xmlText) {
+  // Strip the XML declaration — the string is already decoded from UTF-16 by FileReader,
+  // so encoding="UTF-16" in the declaration confuses DOMParser and causes silent parse failure.
+  const cleaned = xmlText.replace(/<\?xml[^?]*\?>\s*/i, '');
+  const parser  = new DOMParser();
+  const doc     = parser.parseFromString(cleaned, 'text/xml');
+
+  // Process entries in document order.
+  // The file lists changes sequentially: unbind(s) come before bind for each action.
+  // We track per action name: which old keys were unbound, and what the final bind is.
+  const byName = new Map(); // name → { group, unbinds: Set, bindEvent: string|null }
+
+  doc.querySelectorAll('group').forEach(group => {
+    const groupName = group.getAttribute('name') || '';
+    group.querySelectorAll('keymap').forEach(km => {
+      const nameEl   = km.querySelector('n') || km.querySelector('name');
+      const eventEl  = km.querySelector('event');
+      const actionEl = km.querySelector('action');
+      if (!nameEl || !eventEl || !actionEl) return;
+
+      const name   = nameEl.textContent.trim();
+      const event  = eventEl.textContent.trim().toLowerCase();
+      const action = actionEl.textContent.trim();
+      if (!name) return;
+
+      if (!byName.has(name)) {
+        byName.set(name, { group: groupName, unbinds: new Set(), bindEvent: null });
+      }
+      const entry = byName.get(name);
+
+      if (action === 'unbind') {
+        // Record which key is being removed (may be empty string = remove unkeyed slot)
+        entry.unbinds.add(event);
+      } else if (action === 'bind') {
+        // Last bind wins; empty event = action is now unkeyed (cleared)
+        entry.bindEvent = event;
+      }
+    });
+  });
+
+  // Resolve each action to its effective final state:
+  //   bindEvent non-empty  → new key assigned ('bind')
+  //   bindEvent ''         → explicitly cleared ('cleared')
+  //   bindEvent null       → only unbinds, no new key ('unbound')
+  const results = [];
+  byName.forEach((entry, name) => {
+    let effectiveEvent, effectiveAction;
+
+    if (entry.bindEvent !== null && entry.bindEvent !== '') {
+      effectiveEvent  = entry.bindEvent;
+      effectiveAction = 'bind';
+    } else if (entry.bindEvent === '') {
+      effectiveEvent  = '';
+      effectiveAction = 'cleared';   // had a key, now has none
+    } else {
+      // bindEvent === null: only unbind(s), no bind statement
+      effectiveEvent  = '';
+      effectiveAction = 'unbound';   // specific key(s) removed
+    }
+
+    results.push({
+      name:   name,
+      event:  effectiveEvent,
+      action: effectiveAction,
+      group:  entry.group,
+      source: 'custom',
+    });
+  });
+
+  return results;
+}
+
+// ─── Event parsing ────────────────────────────────────────────────────────────
+const MOD_TOKENS = new Set(['shift','control','alt','tab']);
+
+function parseEvent(eventStr) {
+  const parts = eventStr.toLowerCase().split('-');
+  const mods = []; let key = '';
+  for (let i = 0; i < parts.length; i++) {
+    if (MOD_TOKENS.has(parts[i]) && i < parts.length - 1) mods.push(parts[i]);
+    else { key = parts.slice(i).join('-'); break; }
+  }
+  return { mods, key };
+}
+
+function modMatch(eventMods, active) {
+  if (active === 'none')    return eventMods.length === 0;
+  if (active === 'tab')     return eventMods.length === 1 && eventMods[0] === 'tab';
+  if (active === 'shift')   return eventMods.length === 1 && eventMods[0] === 'shift';
+  if (active === 'control') return eventMods.length === 1 && eventMods[0] === 'control';
+  if (active === 'alt')     return eventMods.length === 1 && eventMods[0] === 'alt';
+  return false;
+}
+
+// ─── Build keyboard DOM ───────────────────────────────────────────────────────
+function buildKeyboard() {
+  const kb = document.getElementById('keyboard');
+  kb.innerHTML = '';
+  ROWS.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'kb-row';
+    row.forEach(k => {
+      if (k.w === 'fgap') {
+        const g = document.createElement('div'); g.className = 'fgap'; rowEl.appendChild(g); return;
+      }
+      const el = document.createElement('div');
+      el.className = 'key' + (k.w ? ' ' + k.w : '');
+      el.dataset.keyId = k.id;
+      if (k.id.startsWith('__')) el.style.visibility = 'hidden';
+      el.innerHTML = `<span class="key-label">${k.label}</span><span class="binding-label" id="bl-${k.id}"></span>`;
+      rowEl.appendChild(el);
+    });
+    kb.appendChild(rowEl);
+  });
+}
+
+// ─── Update keyboard highlights ───────────────────────────────────────────────
+function updateKeyboard() {
+  // Clear
+  document.querySelectorAll('.key').forEach(el => {
+    el.className = el.className.replace(/\b(def-only|cust-only|both)\b/g, '').trim();
+    const bl = el.querySelector('.binding-label');
+    if (bl) bl.textContent = '';
+    el._defBindings  = null;
+    el._custBindings = null;
+  });
+
+  // Effective custom events (bind only, keyboard only)
+  const custActive = customBindings.filter(b =>
+    b.action === 'bind' && b.event &&
+    !b.event.match(/mouse|gamepad/i) &&
+    modMatch(parseEvent(b.event).mods, activeModifier)
+  );
+
+  // Default bindings active for this modifier, excluding actions the user
+  // explicitly remapped (by name) or cleared. Event-collision is intentional —
+  // the custom key will render on top via _custBindings.
+  // Defaults always shown — even if the user remapped the action,
+  // the original key still shows the default (marked overridden via 'both' class).
+  const defActive = DEFAULT_BINDINGS.filter(b =>
+    b.event &&
+    modMatch(parseEvent(b.event).mods, activeModifier)
+  );
+
+  // Attach to key elements
+  defActive.forEach(b => {
+    const { key } = parseEvent(b.event);
+    const id = EVENT_TO_KEY[key]; if (!id) return;
+    const el = document.querySelector(`.key[data-key-id="${id}"]`); if (!el) return;
+    if (!el._defBindings) el._defBindings = [];
+    el._defBindings.push(b);
+  });
+
+  custActive.forEach(b => {
+    const { key } = parseEvent(b.event);
+    const id = EVENT_TO_KEY[key]; if (!id) return;
+    const el = document.querySelector(`.key[data-key-id="${id}"]`); if (!el) return;
+    if (!el._custBindings) el._custBindings = [];
+    el._custBindings.push(b);
+  });
+
+  document.querySelectorAll('.key').forEach(el => {
+    const hasDef  = !!(el._defBindings  && el._defBindings.length);
+    const hasCust = !!(el._custBindings && el._custBindings.length);
+    const bl = el.querySelector('.binding-label');
+    if (hasCust && hasDef) {
+      el.classList.add('both');
+      if (bl) bl.textContent = el._custBindings[0].name;
+    } else if (hasCust) {
+      el.classList.add('cust-only');
+      if (bl) bl.textContent = el._custBindings[0].name;
+    } else if (hasDef) {
+      el.classList.add('def-only');
+      // Show first default name; if multiple, indicate count
+      const label = el._defBindings[0].name;
+      if (bl) bl.textContent = el._defBindings.length > 1 ? label + ` +${el._defBindings.length-1}` : label;
+    }
+  });
+}
+
+// ─── Tooltip ──────────────────────────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+
+document.getElementById('keyboard').addEventListener('mouseover', e => {
+  const key = e.target.closest('.key');
+  if (!key) { tooltip.classList.remove('visible'); return; }
+  const hasDef  = key._defBindings  && key._defBindings.length;
+  const hasCust = key._custBindings && key._custBindings.length;
+  if (!hasDef && !hasCust) { tooltip.classList.remove('visible'); return; }
+
+  const label = key.querySelector('.key-label').textContent;
+  let html = `<div class="tip-key">[${modLabel()}] ${label}</div>`;
+
+  if (hasCust) {
+    html += `<div class="tip-section"><div class="tip-section-label cust">▶ Your override</div>`;
+    key._custBindings.forEach(b => {
+      html += `<div class="tip-action">${b.name}</div>`;
+      if (b.group) html += `<div class="tip-meta">${b.group}</div>`;
+    });
+    html += `</div>`;
+  }
+  if (hasDef) {
+    html += `<div class="tip-section"><div class="tip-section-label def">◆ Default</div>`;
+    const shown = key._defBindings.slice(0, 4);
+    shown.forEach(b => {
+      html += `<div class="tip-action">${b.name}</div>`;
+      html += `<div class="tip-meta">${b.group} · ${b.context}</div>`;
+    });
+    if (key._defBindings.length > 4) html += `<div class="tip-meta">+${key._defBindings.length - 4} more…</div>`;
+    html += `</div>`;
+  }
+
+  tooltip.innerHTML = html;
+  tooltip.classList.add('visible');
+});
+document.getElementById('keyboard').addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+document.addEventListener('mousemove', e => {
+  if (!tooltip.classList.contains('visible')) return;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + 310 > window.innerWidth)  x = e.clientX - 310;
+  if (y + 220 > window.innerHeight) y = e.clientY - 220;
+  tooltip.style.left = x + 'px'; tooltip.style.top = y + 'px';
+});
+function modLabel() {
+  return {none:'base',shift:'Shift',control:'Ctrl',alt:'Alt',tab:'Tab+'}[activeModifier];
+}
+
+// ─── Modifier buttons ─────────────────────────────────────────────────────────
+// ─── Modifier key glow ────────────────────────────────────────────────────────
+const MOD_KEY_IDS = {
+  shift:   ['lshift', 'rshift'],
+  control: ['lctrl',  'rctrl'],
+  alt:     ['lalt',   'ralt'],
+  tab:     ['tab'],
+};
+
+function highlightModifierKey(mod) {
+  // Clear all modifier glow classes
+  document.querySelectorAll('.key').forEach(el => {
+    el.className = el.className.replace(/\bmod-active-\S+/g, '').trim();
+  });
+  if (mod === 'none' || !MOD_KEY_IDS[mod]) return;
+  MOD_KEY_IDS[mod].forEach(id => {
+    const el = document.querySelector(`.key[data-key-id="${id}"]`);
+    if (el) el.classList.add(`mod-active-${mod}`);
+  });
+}
+
+document.querySelectorAll('.mod-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeModifier = btn.dataset.mod;
+    highlightModifierKey(activeModifier);
+    updateKeyboard();
+    buildBindingsList();
+  });
+});
+
+// ─── Source tabs ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.src-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.src-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    buildBindingsList();
+  });
+});
+
+// ─── Search ───────────────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.toLowerCase();
+  buildBindingsList();
+});
+
+// ─── Bindings list ────────────────────────────────────────────────────────────
+function buildBindingsList() {
+  const list = document.getElementById('bindingsList');
+  list.innerHTML = '';
+
+  // Build a name→custom lookup for tagging defaults
+  const customByName = new Map();
+  customBindings.forEach(b => customByName.set(b.name, b));
+
+  // Which defaults to show — all of them, including mouse-bound ones
+  const defRows = activeTab !== 'cust'
+    ? DEFAULT_BINDINGS
+    : [];
+
+  // All custom entries — all of them, mouse-bound ones included
+  const custRows = activeTab !== 'def'
+    ? customBindings
+    : [];
+
+  // Apply search
+  const q = searchQuery;
+  const filterRow = b => !q ||
+    b.name.toLowerCase().includes(q) ||
+    (b.group  || '').toLowerCase().includes(q) ||
+    (b.event  || '').toLowerCase().includes(q) ||
+    (b.context|| '').toLowerCase().includes(q);
+
+  const filteredDef  = defRows.filter(filterRow);
+  const filteredCust = custRows.filter(filterRow);
+
+  document.getElementById('defCount').textContent  = filteredDef.length  + ' defaults';
+  document.getElementById('custCount').textContent = filteredCust.length + ' overrides';
+
+  // Group everything
+  const groups = {};
+  filteredDef.forEach(b => {
+    const g = b.group || 'Other';
+    if (!groups[g]) groups[g] = [];
+    const custom      = customByName.get(b.name);
+    const isOverridden = !!(custom && custom.action === 'bind');
+    const isUnbound    = !!(custom && (custom.action === 'cleared' || custom.action === 'unbound'));
+    groups[g].push({ ...b, isCust: false, isOverridden, isUnbound });
+  });
+  filteredCust.forEach(b => {
+    const g = b.group || 'Custom Overrides';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push({ ...b, isCust: true, isOverridden: false, isUnbound: false });
+  });
+
+  if (Object.keys(groups).length === 0) {
+    list.innerHTML = '<div style="padding:20px;color:var(--text-dim);text-align:center;">No bindings match.</div>';
+    return;
+  }
+
+  Object.keys(groups).sort().forEach(gName => {
+    const bindings = groups[gName];
+    const sec   = document.createElement('div'); sec.className = 'group-section';
+    const title = document.createElement('div'); title.className = 'group-title';
+    title.innerHTML = `<span>${gName} <span style="color:var(--text-dim);font-weight:400">(${bindings.length})</span></span><span class="arrow">▾</span>`;
+    const body  = document.createElement('div');
+
+    body.innerHTML = bindings.map(b => {
+      const cls  = b.isCust ? 'is-cust' : (b.isOverridden || b.isUnbound ? 'is-def is-overridden' : 'is-def');
+      const kcls = b.isCust ? 'cust' : 'def';
+      const overtag = (b.isOverridden && !b.isCust) ? '<span class="overridden-tag">overridden</span>'
+                    : (b.isUnbound    && !b.isCust) ? '<span class="overridden-tag">unbound</span>' : '';
+      const label = b.name;
+      const sub   = b.isCust ? (b.group || '') : `${b.context}`;
+      return `<div class="binding-row ${cls}">
+        <div class="binding-chord">${renderChord(b.event, kcls)}${overtag}</div>
+        <div>
+          <div class="binding-name">${label}</div>
+          <div class="binding-ctx">${sub}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    title.addEventListener('click', () => {
+      body.style.display = body.style.display === 'none' ? '' : 'none';
+      title.classList.toggle('collapsed');
+    });
+    sec.appendChild(title); sec.appendChild(body); list.appendChild(sec);
+  });
+}
+
+function renderChord(eventStr, cls) {
+  if (!eventStr) return '<span class="chord-key" style="color:var(--text-dim)">—</span>';
+  const { mods, key } = parseEvent(eventStr);
+  const parts = [...mods.map(m => m[0].toUpperCase()+m.slice(1)), key.toUpperCase()];
+  return parts.map(p => `<span class="chord-key ${cls}">${p}</span>`).join('');
+}
+
+// ─── Upload ───────────────────────────────────────────────────────────────────
+function loadCustomXML(text) {
+  customBindings = parseLocalXML(text);
+  updateKeyboard();
+  buildBindingsList();
+}
+
+document.getElementById('xmlFile').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('uploadZone').classList.add('loaded');
+  const reader = new FileReader();
+  reader.onload = ev => loadCustomXML(ev.target.result);
+  reader.readAsText(file, 'UTF-16');
+});
+
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; });
+zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.name.endsWith('.xml')) return;
+  document.getElementById('fileName').textContent = "File loaded:" + file.name;
+  zone.classList.add('loaded');
+  const reader = new FileReader();
+  reader.onload = ev => loadCustomXML(ev.target.result);
+  reader.readAsText(file, 'UTF-16');
+});
+
+// ─── Parse default_keymap.xml ───────────────────────────────────────────────
+function parseDefaultXML(xmlText) {
+  const cleaned = xmlText.replace(/<\?xml[^?]*\?>\s*/i, '');
+  const parser  = new DOMParser();
+  const doc     = parser.parseFromString(cleaned, 'text/xml');
+  const results = [];
+  doc.querySelectorAll('keymapgroup').forEach(group => {
+    const groupName = group.getAttribute('name') || '';
+    group.querySelectorAll('keymapdata').forEach(kmd => {
+      const nameEl    = kmd.querySelector('name');
+      const eventEl   = kmd.querySelector('event');
+      const contextEl = kmd.querySelector('context');
+      const commandEl = kmd.querySelector('command');
+      if (!nameEl) return;
+      const name    = nameEl.textContent.trim();
+      const event   = (eventEl   ? eventEl.textContent.trim()   : '').toLowerCase();
+      const context = contextEl  ? contextEl.textContent.trim() : '';
+      const command = commandEl  ? commandEl.textContent.trim() : '';
+      if (!name) return;
+      if (event && /gamepad|mouse|axis|stick/i.test(event)) return;
+      results.push({ name, event, context, command, group: groupName });
+    });
+  });
+  return results;
+}
+
+async function loadDefaultKeymap() {
+  const statusEl = document.getElementById('defaultStatus');
+  try {
+    const resp = await fetch('default_keymap.xml');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const text = await resp.text();
+    DEFAULT_BINDINGS = parseDefaultXML(text);
+    statusEl.textContent = `✓ ${DEFAULT_BINDINGS.length} default bindings loaded`;
+    statusEl.style.color = 'var(--accent3)';
+  } catch (err) {
+    statusEl.textContent = `⚠ Could not load default_keymap.xml: ${err.message}`;
+    statusEl.style.color = 'var(--accent)';
+  }
+  updateKeyboard();
+  buildBindingsList();
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+buildKeyboard();
+highlightModifierKey(activeModifier);
+loadDefaultKeymap();
+</script>
+</body>
+</html>
