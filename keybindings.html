@@ -409,11 +409,15 @@ function parseLocalXML(xmlText) {
 
 // ─── Priority pick: context=game always wins label display ───────────────────
 function pickPrimary(bindings) {
-  // Returns the binding that should be displayed on the key cap.
-  // Any binding whose context is 'game' (case-insensitive) takes top priority,
-  // regardless of what its event string is.
-  const gameBinding = bindings.find(b => (b.context || '').toLowerCase() === 'game');
-  return gameBinding || bindings[0];
+  // Priority order for key cap display (context, case-insensitive):
+  //   1. game  2. gridaccel  3. militaryaccel  4. first in array
+  // Priority is based on name/context only — event changes do not affect it.
+  const PRIORITY = ['game', 'gridaccel', 'militaryaccel'];
+  for (const ctx of PRIORITY) {
+    const match = bindings.find(b => (b.context || '').toLowerCase() === ctx);
+    if (match) return match;
+  }
+  return bindings[0];
 }
 
 // ─── Event parsing ────────────────────────────────────────────────────────────
@@ -547,12 +551,10 @@ document.getElementById('keyboard').addEventListener('mouseover', e => {
   }
   if (hasDef) {
     html += `<div class="tip-section"><div class="tip-section-label def">◆ Default</div>`;
+    const CTX_RANK = { game: 0, gridaccel: 1, militaryaccel: 2 };
+    const ctxRank = b => CTX_RANK[(b.context || '').toLowerCase()] ?? 99;
     const shown = [...key._defBindings]
-      .sort((a, b) => {
-        const aGame = (a.context || '').toLowerCase() === 'game';
-        const bGame = (b.context || '').toLowerCase() === 'game';
-        return (bGame ? 1 : 0) - (aGame ? 1 : 0);
-      })
+      .sort((a, b) => ctxRank(a) - ctxRank(b))
       .slice(0, 4);
     shown.forEach(b => {
       html += `<div class="tip-action">${b.name}</div>`;
