@@ -407,6 +407,15 @@ function parseLocalXML(xmlText) {
   return results;
 }
 
+// ─── Priority pick: context=game always wins label display ───────────────────
+function pickPrimary(bindings) {
+  // Returns the binding that should be displayed on the key cap.
+  // Any binding whose context is 'game' (case-insensitive) takes top priority,
+  // regardless of what its event string is.
+  const gameBinding = bindings.find(b => (b.context || '').toLowerCase() === 'game');
+  return gameBinding || bindings[0];
+}
+
 // ─── Event parsing ────────────────────────────────────────────────────────────
 const MOD_TOKENS = new Set(['shift','control','alt','tab']);
 
@@ -508,9 +517,9 @@ function updateKeyboard() {
       if (bl) bl.textContent = el._custBindings[0].name;
     } else if (hasDef) {
       el.classList.add('def-only');
-      // Show first default name; if multiple, indicate count
-      const label = el._defBindings[0].name;
-      if (bl) bl.textContent = el._defBindings.length > 1 ? label + ` +${el._defBindings.length-1}` : label;
+      // game-context bindings always displayed first; fall back to array[0]
+      const primary = pickPrimary(el._defBindings);
+      if (bl) bl.textContent = el._defBindings.length > 1 ? primary.name + ` +${el._defBindings.length-1}` : primary.name;
     }
   });
 }
@@ -538,7 +547,13 @@ document.getElementById('keyboard').addEventListener('mouseover', e => {
   }
   if (hasDef) {
     html += `<div class="tip-section"><div class="tip-section-label def">◆ Default</div>`;
-    const shown = key._defBindings.slice(0, 4);
+    const shown = [...key._defBindings]
+      .sort((a, b) => {
+        const aGame = (a.context || '').toLowerCase() === 'game';
+        const bGame = (b.context || '').toLowerCase() === 'game';
+        return (bGame ? 1 : 0) - (aGame ? 1 : 0);
+      })
+      .slice(0, 4);
     shown.forEach(b => {
       html += `<div class="tip-action">${b.name}</div>`;
       html += `<div class="tip-meta">${b.group} · ${b.context}</div>`;
