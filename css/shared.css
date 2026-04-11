@@ -70,7 +70,7 @@ header {
   transform: rotate(45deg); flex-shrink: 0;
 }
 h1 {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Libre Baskerville', serif;
   font-size: clamp(1.6rem, 4.5vw, 2.8rem);
   color: var(--gold-light);
   letter-spacing: 0.06em;
